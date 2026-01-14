@@ -83,7 +83,17 @@ export SERVER_BASE_URL="http://localhost:${API_PORT}"\n\
 \n\
 # 启动后端（设置 PORT=8001 覆盖 Railway 的值）\n\
 PORT=${API_PORT} python -m api.main &\n\
-sleep 5\n\
+\n\
+# 等待后端启动（最多等待 60 秒）\n\
+echo "Waiting for backend to start..."\n\
+for i in $(seq 1 60); do\n\
+  if curl -s http://localhost:${API_PORT}/health > /dev/null 2>&1; then\n\
+    echo "Backend is ready!"\n\
+    break\n\
+  fi\n\
+  echo "Waiting... ($i/60)"\n\
+  sleep 1\n\
+done\n\
 \n\
 # 启动前端（使用 Railway 提供的端口）\n\
 PORT=${FRONTEND_PORT} HOSTNAME=0.0.0.0 node server.js &\n\
