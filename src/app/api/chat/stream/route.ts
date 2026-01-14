@@ -17,10 +17,6 @@ export async function POST(req: NextRequest) {
 
     const targetUrl = `${TARGET_SERVER_BASE_URL}/chat/completions/stream`;
 
-    // Create AbortController with longer timeout for AI operations
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes timeout
-
     // Make the actual request to the backend service
     const backendResponse = await fetch(targetUrl, {
       method: 'POST',
@@ -29,10 +25,7 @@ export async function POST(req: NextRequest) {
         'Accept': 'text/event-stream', // Indicate that we expect a stream
       },
       body: JSON.stringify(requestBody),
-      signal: controller.signal,
     });
-
-    clearTimeout(timeoutId);
 
     // If the backend service returned an error, forward that error to the client
     if (!backendResponse.ok) {
