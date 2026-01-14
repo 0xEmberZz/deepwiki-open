@@ -67,8 +67,9 @@ RUN mkdir -p /root/.adalflow/repos /root/.adalflow/databases /root/.adalflow/wik
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-API_PORT=8001\n\
+# 保存 Railway 提供的端口给前端\n\
 FRONTEND_PORT=${PORT:-3000}\n\
+API_PORT=8001\n\
 \n\
 echo "=== DeepWiki Railway Deployment ==="\n\
 echo "API Port (internal): $API_PORT"\n\
@@ -80,9 +81,11 @@ fi\n\
 \n\
 export SERVER_BASE_URL="http://localhost:${API_PORT}"\n\
 \n\
-python -m api.main --port ${API_PORT} &\n\
-sleep 3\n\
+# 启动后端（设置 PORT=8001 覆盖 Railway 的值）\n\
+PORT=${API_PORT} python -m api.main &\n\
+sleep 5\n\
 \n\
+# 启动前端（使用 Railway 提供的端口）\n\
 PORT=${FRONTEND_PORT} HOSTNAME=0.0.0.0 node server.js &\n\
 \n\
 wait -n\n\
